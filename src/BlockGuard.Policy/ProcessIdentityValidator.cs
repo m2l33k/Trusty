@@ -165,8 +165,10 @@ public sealed class ProcessIdentityValidator : IProcessIdentityValidator
     {
         try
         {
-            // Use X509Certificate2 to check embedded Authenticode signature
-            using var cert = X509Certificate2.CreateFromSignedFile(filePath);
+            // CreateFromSignedFile returns X509Certificate (base class).
+            // We must convert to X509Certificate2 for chain building.
+            using var baseCert = X509Certificate.CreateFromSignedFile(filePath);
+            using var cert = new X509Certificate2(baseCert);
             using var chain = new X509Chain();
 
             chain.ChainPolicy.RevocationMode = X509RevocationMode.Online;

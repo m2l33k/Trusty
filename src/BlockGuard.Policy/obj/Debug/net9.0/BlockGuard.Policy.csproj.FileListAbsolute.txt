@@ -1,0 +1,16 @@
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\obj\Debug\net9.0\BlockGuard.Policy.csproj.AssemblyReference.cache
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\obj\Debug\net9.0\BlockGuard.Policy.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\obj\Debug\net9.0\BlockGuard.Policy.AssemblyInfoInputs.cache
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\obj\Debug\net9.0\BlockGuard.Policy.AssemblyInfo.cs
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\obj\Debug\net9.0\BlockGuard.Policy.csproj.CoreCompileInputs.cache
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\obj\Debug\net9.0\BlockGuard.Policy.sourcelink.json
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\bin\Debug\net9.0\BlockGuard.Policy.deps.json
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\bin\Debug\net9.0\BlockGuard.Policy.dll
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\bin\Debug\net9.0\BlockGuard.Policy.pdb
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\bin\Debug\net9.0\BlockGuard.Core.dll
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\bin\Debug\net9.0\BlockGuard.Core.pdb
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\obj\Debug\net9.0\BlockGua.65DCF197.Up2Date
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\obj\Debug\net9.0\BlockGuard.Policy.dll
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\obj\Debug\net9.0\refint\BlockGuard.Policy.dll
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\obj\Debug\net9.0\BlockGuard.Policy.pdb
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Policy\obj\Debug\net9.0\ref\BlockGuard.Policy.dll

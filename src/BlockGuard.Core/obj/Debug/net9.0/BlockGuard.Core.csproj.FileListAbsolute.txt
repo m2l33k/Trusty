@@ -1,0 +1,13 @@
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Core\bin\Debug\net9.0\BlockGuard.Core.deps.json
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Core\bin\Debug\net9.0\BlockGuard.Core.dll
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Core\bin\Debug\net9.0\BlockGuard.Core.pdb
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Core\obj\Debug\net9.0\BlockGuard.Core.csproj.AssemblyReference.cache
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Core\obj\Debug\net9.0\BlockGuard.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Core\obj\Debug\net9.0\BlockGuard.Core.AssemblyInfoInputs.cache
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Core\obj\Debug\net9.0\BlockGuard.Core.AssemblyInfo.cs
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Core\obj\Debug\net9.0\BlockGuard.Core.csproj.CoreCompileInputs.cache
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Core\obj\Debug\net9.0\BlockGuard.Core.sourcelink.json
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Core\obj\Debug\net9.0\BlockGuard.Core.dll
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Core\obj\Debug\net9.0\refint\BlockGuard.Core.dll
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Core\obj\Debug\net9.0\BlockGuard.Core.pdb
+C:\Users\m2l3k\Desktop\block\src\BlockGuard.Core\obj\Debug\net9.0\ref\BlockGuard.Core.dll
