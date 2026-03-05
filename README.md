@@ -125,8 +125,8 @@ winget install Microsoft.DotNet.SDK.9
 ### 1. Clone the Repository
 
 ```powershell
-git clone https://github.com/m2l33k/Trusty.git
-cd Trusty
+git clone git@github.com:m2l33k/BlockGuard.git
+cd BlockGuard
 ```
 
 ### 2. Restore Dependencies
@@ -404,7 +404,15 @@ In Terminal 1, you should see a log entry like:
 [03:20:15 WRN] [AUDIT] DENIED access to 'C:\Secrets\api-credentials.json' by PID 9876 (C:\Windows\System32\notepad.exe). Reason: No authorization rule matched
 ```
 
-### Test 7: Verify DPAPI Encryption
+### Test 7: Verify Unauthorized Access Blocked (AI Model)
+
+When a process (like an unauthorized AI model) attempts to read a protected folder or file, the agent immediately denies the access. The AI will receive a strict **Access Denied** error, and the attempt is logged:
+
+<p align="center">
+  <img src="assets/image2.png" alt="Unauthorized Access Denied" width="600" />
+</p>
+
+### Test 8: Verify DPAPI Encryption
 
 ```powershell
 # Check that the .enc file was created
@@ -416,7 +424,7 @@ Test-Path "C:\Secrets\api-credentials.json"
 # Expected: False (if EnableDpapiEncryption is true)
 ```
 
-### Test 8: Tamper Detection
+### Test 9: Tamper Detection
 
 While the agent is running, manually add an unauthorized ACL entry:
 
@@ -429,7 +437,7 @@ icacls "C:\Secrets\api-credentials.json.enc" /grant Users:R
 # [CRT] ACL TAMPERING DETECTED on 'C:\Secrets\api-credentials.json.enc'! Re-applying lockdown.
 ```
 
-### Test 9: Verify Logs Directory
+### Test 10: Verify Logs Directory
 
 ```powershell
 # Check both log locations
