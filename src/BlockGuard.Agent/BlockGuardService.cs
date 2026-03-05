@@ -141,8 +141,16 @@ public sealed class BlockGuardService : BackgroundService
                 }
                 else if (Directory.Exists(fullPath))
                 {
-                    // Lock down the directory itself (with inheritance to all children)
+                    // Lock down the directory itself (blocks listing/traversal)
                     await _aclEnforcer.LockdownDirectoryAsync(fullPath, cancellationToken);
+
+                    // Also recursively lock down every existing file inside.
+                    // (This is required because files might have had inheritance disabled manually
+                    // or by previous versions of the agent, and wouldn't pick up the directory's ACL)
+                    foreach (var file in Directory.EnumerateFiles(fullPath, "*", SearchOption.AllDirectories))
+                    {
+                        await _aclEnforcer.LockdownFileAsync(file, cancellationToken);
+                    }
                 }
                 else
                 {
