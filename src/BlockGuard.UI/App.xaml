@@ -124,47 +124,37 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <!-- Toggle Switch (CheckBox styled as iOS-like toggle) -->
-        <Style x:Key="ToggleSwitch" TargetType="CheckBox">
+        <!-- Toggle Switch (Button styled as iOS-like toggle) -->
+        <!-- Uses Tag="True"/"False" to drive visual state via DataTrigger -->
+        <Style x:Key="ToggleSwitch" TargetType="Button">
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="CheckBox">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <!-- Track -->
-                            <Border x:Name="Track" Grid.Column="0"
-                                    Width="46" Height="26" CornerRadius="13"
-                                    Background="#FF3A3A55" SnapsToDevicePixels="True">
-                                <!-- Knob -->
-                                <Border x:Name="Knob" Width="20" Height="20"
-                                        CornerRadius="10" Background="White"
-                                        HorizontalAlignment="Left" Margin="3,0,0,0"
-                                        SnapsToDevicePixels="True">
-                                    <Border.Effect>
-                                        <DropShadowEffect ShadowDepth="1" BlurRadius="3"
-                                                          Opacity="0.3" Color="Black"/>
-                                    </Border.Effect>
-                                    <Border.RenderTransform>
-                                        <TranslateTransform x:Name="KnobTranslate" X="0"/>
-                                    </Border.RenderTransform>
-                                </Border>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Track"
+                                Width="46" Height="26" CornerRadius="13"
+                                Background="#FF3A3A55" SnapsToDevicePixels="True">
+                            <!-- Knob -->
+                            <Border x:Name="Knob" Width="20" Height="20"
+                                    CornerRadius="10" Background="White"
+                                    HorizontalAlignment="Left" Margin="3,0,0,0"
+                                    SnapsToDevicePixels="True">
+                                <Border.Effect>
+                                    <DropShadowEffect ShadowDepth="1" BlurRadius="3"
+                                                      Opacity="0.3" Color="Black"/>
+                                </Border.Effect>
+                                <Border.RenderTransform>
+                                    <TranslateTransform x:Name="KnobTranslate" X="0"/>
+                                </Border.RenderTransform>
                             </Border>
-
-                            <!-- Label -->
-                            <ContentPresenter Grid.Column="1" Margin="10,0,0,0"
-                                              VerticalAlignment="Center"
-                                              RecognizesAccessKey="True"/>
-                        </Grid>
+                        </Border>
                         <ControlTemplate.Triggers>
-                            <!-- Checked state: slide knob right + green track -->
-                            <Trigger Property="IsChecked" Value="True">
+                            <!-- ON state: Tag=True → slide right + green track -->
+                            <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
                                 <Setter TargetName="Track" Property="Background" Value="#FF2ED573"/>
-                                <Trigger.EnterActions>
+                                <DataTrigger.EnterActions>
                                     <BeginStoryboard>
                                         <Storyboard>
                                             <DoubleAnimation Storyboard.TargetName="KnobTranslate"
@@ -176,8 +166,8 @@
                                             </DoubleAnimation>
                                         </Storyboard>
                                     </BeginStoryboard>
-                                </Trigger.EnterActions>
-                                <Trigger.ExitActions>
+                                </DataTrigger.EnterActions>
+                                <DataTrigger.ExitActions>
                                     <BeginStoryboard>
                                         <Storyboard>
                                             <DoubleAnimation Storyboard.TargetName="KnobTranslate"
@@ -189,8 +179,8 @@
                                             </DoubleAnimation>
                                         </Storyboard>
                                     </BeginStoryboard>
-                                </Trigger.ExitActions>
-                            </Trigger>
+                                </DataTrigger.ExitActions>
+                            </DataTrigger>
                             <!-- Hover glow -->
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Track" Property="Opacity" Value="0.85"/>

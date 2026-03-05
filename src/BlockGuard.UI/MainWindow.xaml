@@ -93,10 +93,10 @@
                                 <TextBlock Text="{Binding StatusIcon}" FontSize="12" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                 <TextBlock Text="{Binding StatusText}" FontSize="12" Foreground="#FFB0B0CC" VerticalAlignment="Center"/>
                             </StackPanel>
-                            <CheckBox Grid.Column="1" Style="{StaticResource ToggleSwitch}"
-                                      IsChecked="{Binding IsAgentRunning, Mode=OneWay}"
-                                      Command="{Binding ToggleAgentCommand}"
-                                      IsEnabled="{Binding IsTogglingAgent, Converter={x:Static local:InverseBoolConverter.Instance}}"/>
+                            <Button Grid.Column="1" Style="{StaticResource ToggleSwitch}"
+                                    Tag="{Binding IsAgentRunning}"
+                                    Command="{Binding ToggleAgentCommand}"
+                                    IsEnabled="{Binding IsTogglingAgent, Converter={x:Static local:InverseBoolConverter.Instance}}"/>
                         </Grid>
                         <TextBlock Text="{Binding ConfigFilePath}" FontSize="9" Foreground="#FF6B6B8D" TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
@@ -191,11 +191,11 @@
                                         </TextBlock>
                                     </StackPanel>
                                 </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource ToggleSwitch}"
-                                          IsChecked="{Binding IsAgentRunning, Mode=OneWay}"
-                                          Command="{Binding ToggleAgentCommand}"
-                                          IsEnabled="{Binding IsTogglingAgent, Converter={x:Static local:InverseBoolConverter.Instance}}"
-                                          VerticalAlignment="Center"/>
+                                <Button Grid.Column="1" Style="{StaticResource ToggleSwitch}"
+                                        Tag="{Binding IsAgentRunning}"
+                                        Command="{Binding ToggleAgentCommand}"
+                                        IsEnabled="{Binding IsTogglingAgent, Converter={x:Static local:InverseBoolConverter.Instance}}"
+                                        VerticalAlignment="Center"/>
                             </Grid>
                         </Border>
                         <TextBlock Text="Quick Actions" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12"/>

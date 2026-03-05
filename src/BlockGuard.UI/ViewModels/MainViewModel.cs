@@ -370,10 +370,11 @@ public sealed class MainViewModel : INotifyPropertyChanged
         {
             IsTogglingAgent = true;
 
-            // Find the agent project path
-            var agentProjectPath = FindAgentProjectPath();
-            if (agentProjectPath == null)
+            // Find the agent project path and solution root
+            var paths = FindAgentProjectPath();
+            if (paths == null)
             {
+                IsTogglingAgent = false;
                 MessageBox.Show(
                     "Could not find the BlockGuard.Agent project.\n" +
                     "Make sure you are running from the solution directory.",
@@ -383,13 +384,16 @@ public sealed class MainViewModel : INotifyPropertyChanged
                 return;
             }
 
+            var (solutionDir, agentCsproj) = paths.Value;
+
+            // Launch with elevation (UAC prompt) — required for ETW + ACL operations
             var startInfo = new ProcessStartInfo
             {
                 FileName = "dotnet",
-                Arguments = $"run --project \"{agentProjectPath}\"",
-                UseShellExecute = false,
-                CreateNoWindow = false,
-                WorkingDirectory = Path.GetDirectoryName(agentProjectPath) ?? ""
+                Arguments = $"run --project \"{agentCsproj}\"",
+                UseShellExecute = true,   // Required for Verb = "runas"
+                Verb = "runas",           // Triggers UAC elevation prompt
+                WorkingDirectory = solutionDir
             };
 
             _agentProcess = Process.Start(startInfo);
@@ -397,7 +401,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
             if (_agentProcess != null)
             {
                 // Give the process a moment to start
-                Task.Delay(1500).ContinueWith(_ =>
+                Task.Delay(2000).ContinueWith(_ =>
                 {
                     Application.Current?.Dispatcher.Invoke(() =>
                     {
@@ -475,9 +479,10 @@ public sealed class MainViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Walks up the directory tree to find the Agent's .csproj file.
+    /// Walks up the directory tree to find the solution root and Agent .csproj.
+    /// Returns (solutionDir, agentCsprojPath) or null if not found.
     /// </summary>
-    private static string? FindAgentProjectPath()
+    private static (string SolutionDir, string CsprojPath)? FindAgentProjectPath()
     {
         var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
         while (dir != null)
@@ -487,7 +492,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
             {
                 var agentCsproj = Path.Combine(dir.FullName, "src", "BlockGuard.Agent", "BlockGuard.Agent.csproj");
                 if (File.Exists(agentCsproj))
-                    return agentCsproj;
+                    return (dir.FullName, agentCsproj);
             }
             dir = dir.Parent;
         }
