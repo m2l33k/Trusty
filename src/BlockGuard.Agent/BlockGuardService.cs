@@ -141,12 +141,8 @@ public sealed class BlockGuardService : BackgroundService
                 }
                 else if (Directory.Exists(fullPath))
                 {
-                    // Lock down all files in the directory recursively
-                    foreach (var file in Directory.EnumerateFiles(
-                        fullPath, "*", SearchOption.AllDirectories))
-                    {
-                        await _aclEnforcer.LockdownFileAsync(file, cancellationToken);
-                    }
+                    // Lock down the directory itself (with inheritance to all children)
+                    await _aclEnforcer.LockdownDirectoryAsync(fullPath, cancellationToken);
                 }
                 else
                 {

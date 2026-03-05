@@ -13,12 +13,20 @@ namespace BlockGuard.Core.Interfaces;
 public interface IAclEnforcer
 {
     /// <summary>
-    /// Locks down a file by removing read access from all principals
-    /// except the agent's own service account and explicitly authorized SIDs.
+    /// Locks down a file by denying read access to Everyone
+    /// and only allowing SYSTEM (the agent's service account).
     /// </summary>
     /// <param name="filePath">Canonical path to the file.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     Task LockdownFileAsync(string filePath, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Locks down a directory and all its children by denying access to Everyone
+    /// and only allowing SYSTEM. Uses inherited ACLs for the directory tree.
+    /// </summary>
+    /// <param name="directoryPath">Canonical path to the directory.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task LockdownDirectoryAsync(string directoryPath, CancellationToken cancellationToken);
 
     /// <summary>
     /// Temporarily grants read access to a specific SID for a protected file.

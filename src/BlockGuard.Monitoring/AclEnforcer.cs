@@ -54,7 +54,6 @@ public sealed class AclEnforcer : IAclEnforcer
             var acl = fileInfo.GetAccessControl();
 
             // Disable inheritance and remove all inherited rules.
-            // This ensures we have full control over the ACL.
             acl.SetAccessRuleProtection(isProtected: true, preserveInheritance: false);
 
             // Remove ALL existing access rules
@@ -68,27 +67,21 @@ public sealed class AclEnforcer : IAclEnforcer
                 acl.RemoveAccessRule(rule);
             }
 
-            // Grant FULL CONTROL only to SYSTEM (our service account)
+            // Implicit Deny: We remove all inherited rules and allow ONLY SYSTEM.
+            // Any other process without an explicit temporary Allow rule will get Access Denied.
             var systemSid = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
             acl.AddAccessRule(new FileSystemAccessRule(
                 systemSid,
                 FileSystemRights.FullControl,
                 AccessControlType.Allow));
 
-            // Grant FULL CONTROL to Administrators (for management)
-            var adminSid = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
-            acl.AddAccessRule(new FileSystemAccessRule(
-                adminSid,
-                FileSystemRights.FullControl,
-                AccessControlType.Allow));
-
-            // Take ownership to prevent non-admins from changing the ACL
-            acl.SetOwner(systemSid);
+            // Note: We DO NOT call SetOwner here. Modifying ownership requires SeTakeOwnershipPrivilege
+            // which often fails. Modifying the DACL to remove all `Allow` rules is sufficient.
 
             fileInfo.SetAccessControl(acl);
 
             _logger.LogInformation(
-                "Locked down file '{FilePath}': access restricted to SYSTEM and Administrators only.",
+                "Locked down file '{FilePath}': Everyone DENIED, only SYSTEM allowed.",
                 filePath);
         }
         catch (UnauthorizedAccessException ex)
@@ -101,6 +94,70 @@ public sealed class AclEnforcer : IAclEnforcer
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to lock down file '{FilePath}'.", filePath);
+            throw;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Locks down a directory by setting deny ACLs on the directory itself
+    /// and all files within it recursively.
+    /// </summary>
+    public Task LockdownDirectoryAsync(string directoryPath, CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(directoryPath);
+
+        try
+        {
+            var dirInfo = new DirectoryInfo(directoryPath);
+            if (!dirInfo.Exists)
+            {
+                _logger.LogWarning("Cannot lock down non-existent directory: {DirPath}", directoryPath);
+                return Task.CompletedTask;
+            }
+
+            // Lock down the directory itself
+            var acl = dirInfo.GetAccessControl();
+
+            acl.SetAccessRuleProtection(isProtected: true, preserveInheritance: false);
+
+            // Remove all existing rules
+            var existingRules = acl.GetAccessRules(
+                includeExplicit: true,
+                includeInherited: true,
+                targetType: typeof(SecurityIdentifier));
+            foreach (FileSystemAccessRule rule in existingRules)
+            {
+                acl.RemoveAccessRule(rule);
+            }
+
+            // Implicit Deny: Allow SYSTEM full control (inherited to children)
+            // Since inheritance is broken and other rules are removed, everyone else is implicitly denied.
+            var systemSid = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
+            acl.AddAccessRule(new FileSystemAccessRule(
+                systemSid,
+                FileSystemRights.FullControl,
+                InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+                PropagationFlags.None,
+                AccessControlType.Allow));
+
+            dirInfo.SetAccessControl(acl);
+
+            _logger.LogInformation(
+                "Locked down directory '{DirPath}': Everyone DENIED, only SYSTEM allowed.",
+                directoryPath);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogCritical(ex,
+                "Cannot modify ACL on directory '{DirPath}' — insufficient privileges.",
+                directoryPath);
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to lock down directory '{DirPath}'.", directoryPath);
             throw;
         }
 
@@ -153,34 +210,58 @@ public sealed class AclEnforcer : IAclEnforcer
     {
         try
         {
-            var fileInfo = new FileInfo(filePath);
-            if (!fileInfo.Exists)
-                return Task.FromResult(false);
+            FileSystemSecurity acl;
 
-            var acl = fileInfo.GetAccessControl();
+            if (File.Exists(filePath))
+            {
+                var fileInfo = new FileInfo(filePath);
+                acl = fileInfo.GetAccessControl();
+            }
+            else if (Directory.Exists(filePath))
+            {
+                var dirInfo = new DirectoryInfo(filePath);
+                acl = dirInfo.GetAccessControl();
+            }
+            else
+            {
+                // Path no longer exists
+                return Task.FromResult(false);
+            }
+
             var rules = acl.GetAccessRules(
                 includeExplicit: true,
                 includeInherited: true,
                 targetType: typeof(SecurityIdentifier));
 
             var systemSid = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
-            var adminSid = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
 
-            // Check that only SYSTEM and Administrators have allow rules
-            // (plus any temporary grants which are transient)
+            bool hasAllowSystem = false;
+
             foreach (FileSystemAccessRule rule in rules)
             {
-                if (rule.AccessControlType == AccessControlType.Allow)
+                var ruleSid = (SecurityIdentifier)rule.IdentityReference;
+
+                if (rule.AccessControlType == AccessControlType.Allow && ruleSid.Equals(systemSid))
                 {
-                    var ruleSid = (SecurityIdentifier)rule.IdentityReference;
-                    if (!ruleSid.Equals(systemSid) && !ruleSid.Equals(adminSid))
-                    {
-                        _logger.LogWarning(
-                            "ACL integrity violation on '{FilePath}': unexpected ALLOW rule for SID {Sid}.",
-                            filePath, ruleSid.Value);
-                        return Task.FromResult(false);
-                    }
+                    hasAllowSystem = true;
                 }
+                else if (rule.AccessControlType == AccessControlType.Allow && !ruleSid.Equals(systemSid))
+                {
+                    // Unexpected allow rule (not SYSTEM)
+                    // Temporary rules might exist, but log a warning just in case.
+                    _logger.LogWarning(
+                        "ACL integrity violation on '{FilePath}': unexpected ALLOW rule for SID {Sid}.",
+                        filePath, ruleSid.Value);
+                    return Task.FromResult(false);
+                }
+            }
+
+            if (!hasAllowSystem)
+            {
+                _logger.LogWarning(
+                    "ACL integrity violation on '{FilePath}': missing ALLOW rule for SYSTEM.",
+                    filePath);
+                return Task.FromResult(false);
             }
 
             // Verify inheritance is disabled (protected)
