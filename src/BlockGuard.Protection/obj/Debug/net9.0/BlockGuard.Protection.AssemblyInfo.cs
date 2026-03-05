@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BlockGuard.Protection")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a07775a26f1509fef9784a8974ebf824f4a74621")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+220d0ec867610bc48289cabefe33c37766991520")]
 [assembly: System.Reflection.AssemblyProductAttribute("BlockGuard.Protection")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BlockGuard.Protection")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
